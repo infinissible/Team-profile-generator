@@ -31,7 +31,6 @@ const copyFile = () => {
 
 // create an array for employees to push
 const employee = [];
-let listAnswer;
 
 async function commonQuestions(role) {
   return await inquirer.prompt([
@@ -96,25 +95,84 @@ async function commonQuestions(role) {
   //   .catch((err) => console.log(err));
 }
 
-async function engineerQuestion() {
-  await inquirer.prompt([
-    {
-      type: 'input',
-      name: 'github',
-      message: "What is your engineer's GitHub username? (required)",
-      validate: (githubInput) => {
-        if (githubInput) {
-          return true;
-        } else {
-          console.log("Please enter the engineer's github uername.");
-          return false;
-        }
+async function addEmployee() {
+  await inquirer
+    .prompt([
+      {
+        type: 'confirm',
+        name: 'confirmAddEmployee',
+        message: 'Would you like to enter another employee?',
+        default: false,
       },
-    },
-  ]);
+      {
+        type: 'list',
+        name: 'role',
+        message: "Which member's role would you like to add?",
+        choices: ['Engineer', 'Intern', 'None'],
+        when: ({ confirmAddEmployee }) => confirmAddEmployee,
+      },
+    ])
+    .then(({ confirmAddEmployee, role }) => {
+      if (confirmAddEmployee) {
+        commonQuestions(role).then(() => {
+          addEmployee();
+          console.log(employee);
+        });
+      } else {
+        return console.log('Good bye !');
+      }
+    });
 }
 
-async function managerQuestion(answers) {
+async function engineerQuestion(commonAnswers) {
+  await inquirer
+    .prompt([
+      {
+        type: 'input',
+        name: 'github',
+        message: "What is your engineer's GitHub username? (required)",
+        validate: (githubInput) => {
+          if (githubInput) {
+            return true;
+          } else {
+            console.log("Please enter the engineer's github uername.");
+            return false;
+          }
+        },
+      },
+    ])
+    .then(({ github }) => {
+      const engineer = new Engineer(
+        commonAnswers.name,
+        commonAnswers.id,
+        commonAnswers.email,
+        github
+      );
+
+      employee.push(engineer);
+      return addEmployee();
+    });
+}
+
+// async function internQuestion() {
+//   await inquirer.prompt([
+//     {
+//       type: 'input',
+//       name: 'school',
+//       message: "What is the name of the intern's school? (required)",
+//       validate: (schoolInput) => {
+//         if (schoolInput) {
+//           return true;
+//         } else {
+//           console.log("Please enter the intern's school.");
+//           return false;
+//         }
+//       },
+//     },
+//   ]);
+// }
+
+async function managerQuestion(commonAnswers) {
   await inquirer
     .prompt([
       {
@@ -139,41 +197,27 @@ async function managerQuestion(answers) {
     ])
     .then(({ officeNumber, role }) => {
       const manager = new Manager(
-        answers.name,
-        answers.id,
-        answers.email,
+        commonAnswers.name,
+        commonAnswers.id,
+        commonAnswers.email,
         officeNumber
       );
 
       employee.push(manager);
-      console.log(employee);
 
-      listAnswer = role;
-      return commonQuestions(role).then((answers) => {
-        if (role === 'Engineer') {
+      if (role === 'Engineer') {
+        commonQuestions(role).then((answers) => {
           engineerQuestion(answers);
-        }
-      });
+        });
+      } else if (role === 'Intern') {
+        commonQuestions(role).then((answers) => {
+          internQuestion(answers);
+        });
+      } else {
+        return answers;
+      }
     });
 }
-
-// async function internQuestion() {
-//   await inquirer.prompt([
-//     {
-//       type: 'input',
-//       name: 'school',
-//       message: "What is the name of the intern's school? (required)",
-//       validate: (schoolInput) => {
-//         if (schoolInput) {
-//           return true;
-//         } else {
-//           console.log("Please enter the intern's school.");
-//           return false;
-//         }
-//       },
-//     },
-//   ]);
-// }
 
 // promptApp()
 //   .then((answers) => {
