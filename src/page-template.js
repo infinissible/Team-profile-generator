@@ -1,9 +1,27 @@
-const generateTeam = (employees) => {
-  return `${employees.map((info) => {
-    if (info.getRole() === 'Engineer') {
-      return `Name: ${info.getName()}`;
-    }
-  })}`;
+const assignInfo = (info) => {
+  if (info.getRole() === 'Manager') {
+    return `Office number: ${info.officeNumber}`;
+  } else if (info.getRole() === 'Engineer') {
+    return `GitHub username: ${info.getGithub()}`;
+  } else if (info.getRole() === 'Intern') {
+    return `School: ${info.getSchool()}`;
+  }
+};
+
+const generateCard = (employees) => {
+  return `${employees
+    .map((info) => {
+      return `<div class="card">
+    <div class="card-header">
+      <h3>${info.getName()}<br /></h3>
+      <p>${info.getRole()}</p>
+    </div>
+    <div class="info">ID: ${info.getId()} <br />Email: ${info.getMail()} <br />
+    ${assignInfo(info)}
+    </div>
+  </div>`;
+    })
+    .join('')}`;
 };
 
 module.exports = (employee) => {
@@ -18,13 +36,13 @@ module.exports = (employee) => {
       <link rel="stylesheet" href="style.css">
     </head>
     <body>
-      <header>
-        <h1>My Team</h1>
+      <header class="header">
+        <h1>Team Alpha</h1>
       </header>
       <main>
-        <section class="cards-container">
-          ${generateTeam(employee)}
-        </section>
+      <section class="flex">
+      ${generateCard(employee)}
+    </section>
       </main>
     </body>
     `;
