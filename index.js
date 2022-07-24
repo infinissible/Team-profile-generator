@@ -32,6 +32,54 @@ const copyFile = () => {
 // create an array for employees to push
 const employee = [];
 
+async function engineerQuestion(commonAnswers) {
+  await inquirer
+    .prompt([
+      {
+        type: 'input',
+        name: 'github',
+        message: "What is your engineer's GitHub username? (required)",
+        validate: (githubInput) => {
+          if (githubInput) {
+            return true;
+          } else {
+            console.log("Please enter the engineer's github uername.");
+            return false;
+          }
+        },
+      },
+    ])
+    .then(({ github }) => {
+      const engineer = new Engineer(
+        commonAnswers.name,
+        commonAnswers.id,
+        commonAnswers.email,
+        github
+      );
+
+      employee.push(engineer);
+      console.log(employee);
+    });
+}
+
+// async function internQuestion() {
+//   await inquirer.prompt([
+//     {
+//       type: 'input',
+//       name: 'school',
+//       message: "What is the name of the intern's school? (required)",
+//       validate: (schoolInput) => {
+//         if (schoolInput) {
+//           return true;
+//         } else {
+//           console.log("Please enter the intern's school.");
+//           return false;
+//         }
+//       },
+//     },
+//   ]);
+// }
+
 async function commonQuestions(role) {
   return await inquirer.prompt([
     {
@@ -74,25 +122,13 @@ async function commonQuestions(role) {
       },
     },
   ]);
-  // .then((data) => {
-  //   console.log(role);
-
+  // .then(async (inputData) => {
   //   if (role === 'Engineer') {
-  //     engineerQuestion(data);
-
-  //     } else if (role === 'Engineer') {
-  //       engineerQuestion();
-  //     } else if (role === 'Intern') {
-  //       internQuestion();
+  //     await engineerQuestion(inputData);
+  //   } else if (role === 'Intern') {
+  //     await internQuestion(inputData);
   //   }
   // });
-  //   .then((answers) => {
-  //     const member = new role(answers);
-  //     employee.push(member);
-  //     console.log(employee);
-  //     return;
-  //   })
-  //   .catch((err) => console.log(err));
 }
 
 async function addEmployee() {
@@ -101,7 +137,7 @@ async function addEmployee() {
       {
         type: 'confirm',
         name: 'confirmAddEmployee',
-        message: 'Would you like to enter another employee?',
+        message: 'Would you like to add employee?',
         default: false,
       },
       {
@@ -113,64 +149,15 @@ async function addEmployee() {
       },
     ])
     .then(({ confirmAddEmployee, role }) => {
-      if (confirmAddEmployee) {
-        commonQuestions(role).then(() => {
-          addEmployee();
-          console.log(employee);
+      if (confirmAddEmployee && role === 'Engineer') {
+        commonQuestions('Engineer').then((answers) => {
+          engineerQuestion(answers).then(addEmployee);
         });
-      } else {
-        return console.log('Good bye !');
+      } else if (confirmAddEmployee && role === 'None') {
+        return console.log('Good Bye !');
       }
     });
 }
-
-async function engineerQuestion(commonAnswers) {
-  await inquirer
-    .prompt([
-      {
-        type: 'input',
-        name: 'github',
-        message: "What is your engineer's GitHub username? (required)",
-        validate: (githubInput) => {
-          if (githubInput) {
-            return true;
-          } else {
-            console.log("Please enter the engineer's github uername.");
-            return false;
-          }
-        },
-      },
-    ])
-    .then(({ github }) => {
-      const engineer = new Engineer(
-        commonAnswers.name,
-        commonAnswers.id,
-        commonAnswers.email,
-        github
-      );
-
-      employee.push(engineer);
-      return addEmployee();
-    });
-}
-
-// async function internQuestion() {
-//   await inquirer.prompt([
-//     {
-//       type: 'input',
-//       name: 'school',
-//       message: "What is the name of the intern's school? (required)",
-//       validate: (schoolInput) => {
-//         if (schoolInput) {
-//           return true;
-//         } else {
-//           console.log("Please enter the intern's school.");
-//           return false;
-//         }
-//       },
-//     },
-//   ]);
-// }
 
 async function managerQuestion(commonAnswers) {
   await inquirer
@@ -188,14 +175,14 @@ async function managerQuestion(commonAnswers) {
           }
         },
       },
-      {
-        type: 'list',
-        name: 'role',
-        message: "Which member's role would you like to add?",
-        choices: ['Engineer', 'Intern', 'None'],
-      },
+      // {
+      //   type: 'list',
+      //   name: 'role',
+      //   message: "Which member's role would you like to add?",
+      //   choices: ['Engineer', 'Intern', 'None'],
+      // },
     ])
-    .then(({ officeNumber, role }) => {
+    .then(({ officeNumber }) => {
       const manager = new Manager(
         commonAnswers.name,
         commonAnswers.id,
@@ -204,18 +191,18 @@ async function managerQuestion(commonAnswers) {
       );
 
       employee.push(manager);
-
-      if (role === 'Engineer') {
-        commonQuestions(role).then((answers) => {
-          engineerQuestion(answers);
-        });
-      } else if (role === 'Intern') {
-        commonQuestions(role).then((answers) => {
-          internQuestion(answers);
-        });
-      } else {
-        return answers;
-      }
+      addEmployee();
+      // if (role === 'Engineer') {
+      //   commonQuestions(role).then((answers) => {
+      //     engineerQuestion(answers);
+      //   });
+      // } else if (role === 'Intern') {
+      //   commonQuestions(role).then((answers) => {
+      //     internQuestion(answers);
+      //   });
+      // } else {
+      //   return answers;
+      // }
     });
 }
 
