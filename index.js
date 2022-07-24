@@ -62,23 +62,35 @@ async function engineerQuestion(commonAnswers) {
     });
 }
 
-// async function internQuestion() {
-//   await inquirer.prompt([
-//     {
-//       type: 'input',
-//       name: 'school',
-//       message: "What is the name of the intern's school? (required)",
-//       validate: (schoolInput) => {
-//         if (schoolInput) {
-//           return true;
-//         } else {
-//           console.log("Please enter the intern's school.");
-//           return false;
-//         }
-//       },
-//     },
-//   ]);
-// }
+async function internQuestion(commonAnswers) {
+  await inquirer
+    .prompt([
+      {
+        type: 'input',
+        name: 'school',
+        message: "What is the name of the intern's school? (required)",
+        validate: (schoolInput) => {
+          if (schoolInput) {
+            return true;
+          } else {
+            console.log("Please enter the intern's school.");
+            return false;
+          }
+        },
+      },
+    ])
+    .then(({ school }) => {
+      const intern = new Intern(
+        commonAnswers.name,
+        commonAnswers.id,
+        commonAnswers.email,
+        school
+      );
+
+      employee.push(intern);
+      console.log(employee);
+    });
+}
 
 async function commonQuestions(role) {
   return await inquirer.prompt([
@@ -122,13 +134,6 @@ async function commonQuestions(role) {
       },
     },
   ]);
-  // .then(async (inputData) => {
-  //   if (role === 'Engineer') {
-  //     await engineerQuestion(inputData);
-  //   } else if (role === 'Intern') {
-  //     await internQuestion(inputData);
-  //   }
-  // });
 }
 
 async function addEmployee() {
@@ -141,6 +146,13 @@ async function addEmployee() {
         default: false,
       },
       {
+        type: 'confirm',
+        name: 'confirmEnd',
+        message: 'Do you want to end the program?',
+        default: false,
+        when: ({ confirmAddEmployee }) => confirmAddEmployee === false,
+      },
+      {
         type: 'list',
         name: 'role',
         message: "Which member's role would you like to add?",
@@ -148,12 +160,18 @@ async function addEmployee() {
         when: ({ confirmAddEmployee }) => confirmAddEmployee,
       },
     ])
-    .then(({ confirmAddEmployee, role }) => {
+    .then(({ confirmAddEmployee, confirmEnd, role }) => {
       if (confirmAddEmployee && role === 'Engineer') {
         commonQuestions('Engineer').then((answers) => {
           engineerQuestion(answers).then(addEmployee);
         });
+      } else if (confirmAddEmployee && role === 'Intern') {
+        commonQuestions('Intern').then((answers) => {
+          internQuestion(answers).then(addEmployee);
+        });
       } else if (confirmAddEmployee && role === 'None') {
+        return console.log('Good Bye !');
+      } else if (confirmEnd) {
         return console.log('Good Bye !');
       }
     });
@@ -175,12 +193,6 @@ async function managerQuestion(commonAnswers) {
           }
         },
       },
-      // {
-      //   type: 'list',
-      //   name: 'role',
-      //   message: "Which member's role would you like to add?",
-      //   choices: ['Engineer', 'Intern', 'None'],
-      // },
     ])
     .then(({ officeNumber }) => {
       const manager = new Manager(
@@ -192,17 +204,6 @@ async function managerQuestion(commonAnswers) {
 
       employee.push(manager);
       addEmployee();
-      // if (role === 'Engineer') {
-      //   commonQuestions(role).then((answers) => {
-      //     engineerQuestion(answers);
-      //   });
-      // } else if (role === 'Intern') {
-      //   commonQuestions(role).then((answers) => {
-      //     internQuestion(answers);
-      //   });
-      // } else {
-      //   return answers;
-      // }
     });
 }
 
@@ -222,6 +223,14 @@ async function managerQuestion(commonAnswers) {
 //   })
 //   .catch((err) => console.log(err));
 
-commonQuestions('Manager').then((answers) => {
-  managerQuestion(answers);
-});
+function initApp() {
+  console.log('-----------------------------------');
+  console.log('Welcome to Team profile generator !');
+  console.log('-----------------------------------');
+
+  commonQuestions('Manager').then((answers) => {
+    managerQuestion(answers);
+  });
+}
+
+initApp();
