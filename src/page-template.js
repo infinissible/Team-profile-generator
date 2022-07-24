@@ -1,10 +1,9 @@
 const generateTeam = (employees) => {
-  employees.map((info) => {
+  return `${employees.map((info) => {
     if (info.getRole() === 'Engineer') {
-      console.log(info.getName());
-      return info.getName();
+      return `Name: ${info.getName()}`;
     }
-  });
+  })}`;
 };
 
 module.exports = (employee) => {

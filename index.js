@@ -175,6 +175,7 @@ async function addEmployee() {
         console.log('Good Bye !');
         console.log(employee);
         writeToFile(generateHTML(employee));
+        copyFile();
       } else if (!confirmEnd) {
         return addEmployee();
       }
