@@ -1,14 +1,4 @@
-const generateTeam = (employees) => {
-  employees.map((info) => {
-    if (info.getRole() === 'Engineer') {
-      console.log(info.getName());
-      return info.getName();
-    }
-  });
-};
 
-module.exports = (employee) => {
-  return `
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -24,9 +14,8 @@ module.exports = (employee) => {
       </header>
       <main>
         <section class="cards-container">
-          ${generateTeam(employee)}
+          undefined
         </section>
       </main>
     </body>
-    `;
-};
+    

@@ -32,6 +32,7 @@ const copyFile = () => {
 // create an array for employees to push
 const employee = [];
 
+// create an inquirer for engineer
 async function engineerQuestion(commonAnswers) {
   await inquirer
     .prompt([
@@ -58,10 +59,10 @@ async function engineerQuestion(commonAnswers) {
       );
 
       employee.push(engineer);
-      console.log(employee);
     });
 }
 
+// create an inquirer for intern
 async function internQuestion(commonAnswers) {
   await inquirer
     .prompt([
@@ -88,10 +89,10 @@ async function internQuestion(commonAnswers) {
       );
 
       employee.push(intern);
-      console.log(employee);
     });
 }
 
+// create an inquirer for common questions
 async function commonQuestions(role) {
   return await inquirer.prompt([
     {
@@ -136,6 +137,7 @@ async function commonQuestions(role) {
   ]);
 }
 
+// pop up add employee inquirer if it is required to add more employee
 async function addEmployee() {
   await inquirer
     .prompt([
@@ -169,14 +171,17 @@ async function addEmployee() {
         commonQuestions('Intern').then((answers) => {
           internQuestion(answers).then(addEmployee);
         });
-      } else if (confirmAddEmployee && role === 'None') {
-        return console.log('Good Bye !');
-      } else if (confirmEnd) {
-        return console.log('Good Bye !');
+      } else if ((confirmAddEmployee && role === 'None') || confirmEnd) {
+        console.log('Good Bye !');
+        console.log(employee);
+        writeToFile(generateHTML(employee));
+      } else if (!confirmEnd) {
+        return addEmployee();
       }
     });
 }
 
+// run managerQuestion when propmt starts
 async function managerQuestion(commonAnswers) {
   await inquirer
     .prompt([
@@ -207,30 +212,33 @@ async function managerQuestion(commonAnswers) {
     });
 }
 
-// promptApp()
-//   .then((answers) => {
-//     return generateHTML(answers);
-//   })
-//   .then((htmlFile) => {
-//     return writeToFile(htmlFile);
-//   })
-//   .then((htmlResponse) => {
-//     console.log(htmlResponse);
-//     return copyFile();
-//   })
-//   .then((copyfileResponse) => {
-//     console.log(copyfileResponse);
-//   })
-//   .catch((err) => console.log(err));
+// welcome log added
+async function initApp() {
+  console.log(`
+  ===================================
+  Welcome to Team profile generator !
+  ===================================
+  `);
 
-function initApp() {
-  console.log('-----------------------------------');
-  console.log('Welcome to Team profile generator !');
-  console.log('-----------------------------------');
-
-  commonQuestions('Manager').then((answers) => {
-    managerQuestion(answers);
-  });
+  await commonQuestions('Manager')
+    .then((answers) => {
+      managerQuestion(answers);
+    })
+    .catch((err) => console.log(err));
+  // .then(async (data) => {
+  //   return generateHTML(data);
+  // })
+  // .then((htmlFile) => {
+  //   return writeToFile(htmlFile);
+  // })
+  // .then((htmlResponse) => {
+  //   console.log(htmlResponse);
+  //   return copyFile();
+  // })
+  // .then((copyfileResponse) => {
+  //   console.log(copyfileResponse);
+  // })
+  // .catch((err) => console.log(err));
 }
 
 initApp();
