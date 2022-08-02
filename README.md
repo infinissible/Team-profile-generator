@@ -25,10 +25,6 @@ This is a Node.js command-line application that takes in information about emplo
 Main HTML page in the browser
 <img src='./src/jpg/main.jpg' />
 
-## Contributing
-
-Jin
-
 ## Tests
 
 `node index`
